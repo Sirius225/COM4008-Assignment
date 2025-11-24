@@ -1,22 +1,22 @@
-import pygame
+import pygame as pg
 import random
 
-pygame.init()
+pg.init()
 
 # Screen setup 
 WIDTH, HEIGHT = 672, 768
-screen = pygame.display.set_mode([WIDTH, HEIGHT])
-pygame.display.set_caption("Space Invaders")
+screen = pg.display.set_mode([WIDTH, HEIGHT])
+pg.display.set_caption("Space Invaders")
 
 BLACK = (0, 0, 0)
 
 # Invader Class
-class Invader(pygame.sprite.Sprite):
+class Invader(pg.sprite.Sprite):
     def __init__(self, x, y, image_file):
         super().__init__()
         # loads image and scales to the same size as before
-        self.image = pygame.image.load(image_file).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.image = pg.image.load(image_file).convert_alpha()
+        self.image = pg.transform.scale(self.image, (30, 30))
         self.rect = self.image.get_rect(topleft=(x, y))
 
     def move(self, dx, dy):
@@ -41,21 +41,21 @@ class Octopus(Invader): # Invader3
 
 
 #Defender class
-class Defender(pygame.sprite.Sprite):
+class Defender(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("defender.png").convert_alpha() #loads the defender sprite
+        self.image = pg.image.load("defender.png").convert_alpha() #loads the defender sprite
 
         # Scales the sprite to the correct size
-        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.image = pg.transform.scale(self.image, (30, 30))
 
         self.rect = self.image.get_rect(midbottom=(x, y))
         self.speed = 5
 
     def update(self, keys): #reads keyboard inputs
-        if keys[pygame.K_LEFT]:
+        if keys[pg.K_LEFT]:
             self.rect.x -= self.speed
-        if keys[pygame.K_RIGHT]:
+        if keys[pg.K_RIGHT]:
             self.rect.x += self.speed
 
         # Prevents the defender to leave the screen bounderies
@@ -64,10 +64,10 @@ class Defender(pygame.sprite.Sprite):
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
             
-class InvaderBullet(pygame.sprite.Sprite):
+class InvaderBullet(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((4, 12))
+        self.image = pg.Surface((4, 12))
         self.image.fill((255, 255, 255))
         self.rect = self.image.get_rect(center=(x, y))
         self.speed = 5
@@ -85,8 +85,8 @@ def remove_invader(inv):
     inv.kill()
     speed_x *= INVADER_SPEED_MULTIPLIER
 
-all_sprites = pygame.sprite.Group()
-invader_bullets = pygame.sprite.Group()
+all_sprites = pg.sprite.Group()
+invader_bullets = pg.sprite.Group()
 
 # 2D array of invaders
 ROWS = 5
@@ -98,7 +98,7 @@ START_X = 80
 START_Y = 80
 
 invaders = []
-all_sprites = pygame.sprite.Group()
+all_sprites = pg.sprite.Group()
 
 for row in range(ROWS):
     row_list = []
@@ -135,14 +135,17 @@ def get_edges(): # This gets the information of the leftmost and rightmost invad
 
 # The game Loop 
 running = True
-clock = pygame.time.Clock() # adds clock object to allow for the controlling of game speed
+clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
 
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
             running = False
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_SPACE:
+              player.shoot()
     #player movement
-    keys = pygame.key.get_pressed()
+    keys = pg.key.get_pressed()
     player.update(keys)
     
     left_edge, right_edge = get_edges() #Finds the leftmost and rightmost invaders in the array
@@ -181,16 +184,16 @@ while running:
     invader_bullets.update()
 
     # Defender gets = game over
-    if pygame.sprite.spritecollide(player, invader_bullets, True):
+    if pg.sprite.spritecollide(player, invader_bullets, True):
         running = False
         print("GAME OVER You have died.")
 
     # Creates frame
     screen.fill(BLACK)
     all_sprites.draw(screen)
-    pygame.display.flip()
+    pg.display.flip()
     clock.tick(45) # game speed in fps
 
-pygame.quit()
+pg.quit()
 
 
