@@ -3,7 +3,7 @@ import random
 
 pygame.init()
 
-# Screen setup 
+# Screen setup
 WIDTH, HEIGHT = 672, 768
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption("Space Invaders")
