@@ -22,6 +22,48 @@ class Invader(pg.sprite.Sprite):
     def move(self, dx, dy):
         self.rect.x += dx
         self.rect.y += dy
+
+#player class
+class Player(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.transform.scale("defender.png", (50, 38))
+        #self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH/2. #player spawning point
+        self.rect.bottom = HEIGHT - 10
+        self.speedx = 0
+
+    def update(self):
+        self.speedx = 0 #speed of sprite initially
+# sprite movement and speed
+        keystate = pg.key.get_pressed()
+        if keystate[pg.K_LEFT]:
+            self.speedx = -5
+        if keystate[pg.K_RIGHT]:
+            self.speedx = 5
+        self.rect.x += self.speedx
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH #prevents the player from going out side the screen
+        if self.rect.left < 0:
+            self.rect.left = 0 
+
+class Bullet(pg.sprite.Sprite):
+  def __init__(self, x, y):
+    pg.sprite.Sprite.__init__(self)
+    self.image = pg.Surface((5,10))
+    self.image = bullet_img  
+    self.image.set_colorkey(BLACK)
+    self.rect = self.image.get_rect()
+    self.rect.bottom = y
+    self. rect.centerx = x
+    self.speedy = -10
+
+    def shoot(self):
+        bullet = Bullet(self.rect.centerx, self.rect.top)
+        all_sprites.add(bullet)
+        bullets.add(bullet)     
+
        
 
 # Subclasses 
