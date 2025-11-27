@@ -40,7 +40,7 @@ class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y):
     pg.sprite.Sprite.__init__(self)
     self.image = pg.Surface((5,10))
-    self.image = bullet_img  
+    self.image = pg.transform.scale("laserBlue13.png", (50, 38))
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.bottom = y
@@ -54,10 +54,10 @@ class Bullet(pg.sprite.Sprite):
         self.kill()
 
 
-    def shoot(self):
-        bullet = Bullet(self.rect.centerx, self.rect.top)
-        all_sprites.add(bullet)
-        bullets.add(bullet)     
+def shoot(self):
+    bullet = Bullet(self.rect.centerx, self.rect.top)
+    all_sprites.add(bullet)
+    bullets.add(bullet)     
 
 
 bullets = pg.sprite.Group()#object is created
@@ -93,7 +93,7 @@ class Octopus(Invader): # Invader3
 
 
 #Defender class
-class Defender(pg.sprite.Sprite):
+"""class Defender(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pg.image.load("defender.png").convert_alpha() #loads the defender sprite
@@ -115,7 +115,7 @@ class Defender(pg.sprite.Sprite):
             self.rect.left = 0
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
-            
+"""            
 class InvaderBullet(pg.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -170,8 +170,9 @@ for row in range(ROWS):
     invaders.append(row_list)
 
 #creates the player
-player = Defender(WIDTH // 2, HEIGHT - 20)
+player = Player()
 all_sprites.add(player)
+
 
 # Movement
 speed_x = 1
@@ -195,7 +196,7 @@ while running:
             running = False
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
-              player.shoot()
+               player.shoot()
     #player movement
     keys = pg.key.get_pressed()
     player.update(keys)
