@@ -3,7 +3,7 @@ import random
 
 pg.init()
 
-# Screen setup 
+# Screen setup
 WIDTH, HEIGHT = 672, 768
 screen = pg.display.set_mode([WIDTH, HEIGHT])
 pg.display.set_caption("Space Invaders")
