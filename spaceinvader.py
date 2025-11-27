@@ -10,20 +10,8 @@ pg.display.set_caption("Space Invaders")
 
 BLACK = (0, 0, 0)
 
-# Invader Class
-class Invader(pg.sprite.Sprite):
-    def __init__(self, x, y, image_file):
-        super().__init__()
-        # loads image and scales to the same size as before
-        self.image = pg.image.load(image_file).convert_alpha()
-        self.image = pg.transform.scale(self.image, (30, 30))
-        self.rect = self.image.get_rect(topleft=(x, y))
 
-    def move(self, dx, dy):
-        self.rect.x += dx
-        self.rect.y += dy
 
-#player class
 class Player(pg.sprite.Sprite):
     def __init__(self):
         pg.sprite.Sprite.__init__(self)
@@ -59,12 +47,34 @@ class Bullet(pg.sprite.Sprite):
     self. rect.centerx = x
     self.speedy = -10
 
+  def update(self):
+    self.rect.y += self.speedy
+    #kill if it moves off the top of the screen
+    if self.rect.bottom < 0:
+        self.kill()
+
+
     def shoot(self):
         bullet = Bullet(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
         bullets.add(bullet)     
 
+
+bullets = pg.sprite.Group()#object is created
        
+# Invader Class
+class Invader(pg.sprite.Sprite):
+    def __init__(self, x, y, image_file):
+        super().__init__()
+        # loads image and scales to the same size as before
+        self.image = pg.image.load(image_file).convert_alpha()
+        self.image = pg.transform.scale(self.image, (30, 30))
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def move(self, dx, dy):
+        self.rect.x += dx
+        self.rect.y += dy
+
 
 # Subclasses 
 class Squid(Invader):   # Invader1
