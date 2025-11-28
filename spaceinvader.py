@@ -7,6 +7,7 @@ pg.init()
 WIDTH, HEIGHT = 672, 768
 screen = pg.display.set_mode([WIDTH, HEIGHT])
 pg.display.set_caption("Space Invaders")
+clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
 
 BLACK = (0, 0, 0)
 
@@ -15,8 +16,8 @@ BLACK = (0, 0, 0)
 class Player(pg.sprite.Sprite):
     def __init__(self):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.transform.scale("defender.png", (50, 38))
-        #self.image.fill(GREEN)
+        self.image = pg.image.load("defender.png").convert()
+        self.image = pg.transform.scale(self.image, (50, 38))
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH/2. #player spawning point
         self.rect.bottom = HEIGHT - 10
@@ -35,6 +36,12 @@ class Player(pg.sprite.Sprite):
             self.rect.right = WIDTH #prevents the player from going out side the screen
         if self.rect.left < 0:
             self.rect.left = 0 
+    
+
+    def shoot(self):
+        bullet = Bullet(self.rect.centerx, self.rect.top)
+        all_sprites.add(bullet)
+        bullets.add(bullet)     
 
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y):
@@ -54,12 +61,7 @@ class Bullet(pg.sprite.Sprite):
         self.kill()
 
 
-def shoot(self):
-    bullet = Bullet(self.rect.centerx, self.rect.top)
-    all_sprites.add(bullet)
-    bullets.add(bullet)     
-
-
+ 
 bullets = pg.sprite.Group()#object is created
        
 # Invader Class
@@ -170,6 +172,7 @@ for row in range(ROWS):
     invaders.append(row_list)
 
 #creates the player
+bullets = pg.sprite.Group()
 player = Player()
 all_sprites.add(player)
 
@@ -186,7 +189,8 @@ def get_edges(): # This gets the information of the leftmost and rightmost invad
     return left, right
 
 
-# The game Loop 
+# The game Loop
+
 running = True
 clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
 
@@ -196,10 +200,9 @@ while running:
             running = False
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
-               player.shoot()
+                player.shoot()
     #player movement
-    keys = pg.key.get_pressed()
-    player.update(keys)
+    all_sprites.update()
     
     left_edge, right_edge = get_edges() #Finds the leftmost and rightmost invaders in the array
     shift_down = False
