@@ -153,6 +153,7 @@ START_Y = 80
 
 invaders = []
 all_sprites = pg.sprite.Group()
+invader_group = pg.sprite.Group()
 
 for row in range(ROWS):
     row_list = []
@@ -166,7 +167,7 @@ for row in range(ROWS):
             inv = Crab(x, y)             # 2 rows of Crab
         else:
             inv = Octopus(x, y)          # 2 rows of Octopus
-        invader_group = pg.sprite.Group()
+
         row_list.append(inv)
         all_sprites.add(inv)
     invaders.append(row_list)
