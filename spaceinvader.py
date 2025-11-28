@@ -166,7 +166,7 @@ for row in range(ROWS):
             inv = Crab(x, y)             # 2 rows of Crab
         else:
             inv = Octopus(x, y)          # 2 rows of Octopus
-
+        invader_group = pg.sprite.Group()
         row_list.append(inv)
         all_sprites.add(inv)
     invaders.append(row_list)
@@ -239,10 +239,17 @@ while running:
     # Update bullets
     invader_bullets.update()
 
+  # check to see if bullet hit an invader
+    hits  = pg.sprite.groupcollide(invaders, bullets, False, True)
+    for invader, bullet_list in hits.items():
+        remove_invader(invader)
+
+
     # Defender gets = game over
     if pg.sprite.spritecollide(player, invader_bullets, True):
         running = False
         print("GAME OVER You have died.")
+
 
     # Creates frame
     screen.fill(BLACK)
