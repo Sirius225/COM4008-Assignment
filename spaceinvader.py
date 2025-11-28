@@ -46,12 +46,12 @@ class Player(pg.sprite.Sprite):
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y):
     pg.sprite.Sprite.__init__(self)
-    self.image = pg.Surface((5,10))
-    self.image = pg.transform.scale("laserBlue13.png", (50, 38))
+    self.image = pg.image.load("laserBlue13.png").convert()
+    self.image = pg.transform.scale(self.image, (50, 38))
     self.image.set_colorkey(BLACK)
     self.rect = self.image.get_rect()
     self.rect.bottom = y
-    self. rect.centerx = x
+    self.rect.centerx = x
     self.speedy = -10
 
   def update(self):
