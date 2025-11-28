@@ -41,7 +41,7 @@ class Player(pg.sprite.Sprite):
     def shoot(self):
         bullet = Bullet(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
-        bullets.add(bullet)     
+        bullets.add(bullet)      
 
 class Bullet(pg.sprite.Sprite):
   def __init__(self, x, y):
