@@ -22,6 +22,7 @@ class Player(pg.sprite.Sprite):
         self.rect.centerx = WIDTH/2. #player spawning point
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
+        self.lives = 3
 
     def update(self):
         self.speedx = 0 #speed of sprite initially
@@ -249,6 +250,8 @@ while running:
 
     # Defender gets = game over
     if pg.sprite.spritecollide(player, invader_bullets, True):
+        player.hide()
+        player.lives -= 1
         running = False
         print("GAME OVER You have died.")
 
