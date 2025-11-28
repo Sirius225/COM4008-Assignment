@@ -169,6 +169,7 @@ for row in range(ROWS):
             inv = Octopus(x, y)          # 2 rows of Octopus
 
         row_list.append(inv)
+        invader_group.add(inv)
         all_sprites.add(inv)
     invaders.append(row_list)
 
@@ -241,7 +242,7 @@ while running:
     invader_bullets.update()
 
   # check to see if bullet hit an invader
-    hits  = pg.sprite.groupcollide(invaders, bullets, False, True)
+    hits = pg.sprite.groupcollide(invader_group, bullets, True, True)
     for invader, bullet_list in hits.items():
         remove_invader(invader)
 
