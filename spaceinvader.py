@@ -39,6 +39,9 @@ class Player(pg.sprite.Sprite):
             self.rect.right = WIDTH #prevents the player from going out side the screen
         if self.rect.left < 0:
             self.rect.left = 0
+    
+    def hide (self):
+        
 
 
     def shoot(self):
