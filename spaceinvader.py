@@ -24,7 +24,7 @@ class Player(pg.sprite.Sprite):
         self.speedx = 0
         self.lives = 3 #number of lives
         self.hidden = False #to check if the player is hidden when hit by invader bullet
-        self.hide_timer = 0
+        self.hide_timer = 2 #timer for hiding the player
 
     def update(self):
         self.speedx = 0 #speed of sprite initially
@@ -250,10 +250,12 @@ while running:
         remove_invader(invader)
 
 
-    # Defender gets = game over
+    # Defender gets hits and loses a life
     if pg.sprite.spritecollide(player, invader_bullets, True):
         player.hide()
         player.lives -= 1
+    # Check for game over
+    if player.lives == 0:
         running = False
         print("GAME OVER You have died.")
 
