@@ -23,6 +23,8 @@ class Player(pg.sprite.Sprite):
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.lives = 3
+        self.hidden = False
+        self.hide_timer = 0
 
     def update(self):
         self.speedx = 0 #speed of sprite initially
