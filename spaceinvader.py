@@ -46,7 +46,12 @@ class Player(pg.sprite.Sprite):
         self.hide_timer = pg.time.get_ticks()
         self.rect.center = (WIDTH/2, HEIGHT + 200) #moves the player off screen
         
-
+    def update(self):
+	# unhide if hidden
+        if self.hidden and pg.time.get_ticks() - self.hide_timer > 1000:
+            self.hidden = False
+            self.rect.centerx = WIDTH / 2
+            self.rect.bottom = HEIGHT - 10
 
     def shoot(self):
         bullet = Bullet(self.rect.centerx, self.rect.top)
