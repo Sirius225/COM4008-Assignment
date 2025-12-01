@@ -41,6 +41,10 @@ class Player(pg.sprite.Sprite):
             self.rect.left = 0
     
     def hide (self):
+        #hide the player temporarily
+        self.hidden = True
+        self.hide_timer = pg.time.get_ticks()
+        self.rect.center = (WIDTH/2, HEIGHT + 200) #moves the player off screen
         
 
 
