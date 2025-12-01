@@ -234,10 +234,11 @@ while running:
     # Invaders shooting
     for row in invaders:
         for inv in row:
-            if random.random() < SHOOT_CHANCE:
-                bullet = InvaderBullet(inv.rect.centerx, inv.rect.bottom)
-                invader_bullets.add(bullet)
-                all_sprites.add(bullet)
+            if inv.alive():
+                if random.random() < SHOOT_CHANCE:
+                    bullet = InvaderBullet(inv.rect.centerx, inv.rect.bottom)
+                    invader_bullets.add(bullet)
+                    all_sprites.add(bullet)
 
     # Update bullets
     invader_bullets.update()
