@@ -256,7 +256,7 @@ while running:
         player.lives -= 1
     # Check for game over
     if player.lives == 0:
-        running = False
+        running = False 
         print("GAME OVER You have died.")
 
 
