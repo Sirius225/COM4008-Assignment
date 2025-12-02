@@ -283,7 +283,7 @@ while running:
     # Creates frame
     screen.fill(BLACK)
     all_sprites.draw(screen)
-    draw_text(screen,"score", 22, WIDTH /10, 10)
+    draw_text(screen,"lives = " + str(player.lives), 22, WIDTH /10, 10)
     pg.display.flip()
     clock.tick(45) # game speed in fps
 
