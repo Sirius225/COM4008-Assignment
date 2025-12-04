@@ -10,6 +10,16 @@ pg.display.set_caption("Space Invaders")
 clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
 
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+font_name = pg.font.match_font("arial")
+def draw_text(surf, text, size, x, y):
+  font = pg.font.Font(font_name, size)
+  text_surface = font.render(text,True, WHITE) 
+  text_rect = text_surface.get_rect()
+  text_rect.midtop = (x , y)
+  surf.blit(text_surface, text_rect)
+
 
 
 
@@ -17,12 +27,14 @@ class Player(pg.sprite.Sprite):
     def __init__(self):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load("defender.png").convert()
-        self.image = pg.transform.scale(self.image, (50, 38))
+        self.image = pg.transform.scale(self.image, (50, 38))#to generate the size of the player
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH/2. #player spawning point
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
-        self.lives = 3
+        self.lives = 3 #number of lives
+        self.hidden = False #to check if the player is hidden when hit by invader bullet
+        self.hide_timer = 2 #timer for hiding the player
 
     def update(self):
         self.speedx = 0 #speed of sprite initially
@@ -36,9 +48,18 @@ class Player(pg.sprite.Sprite):
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH #prevents the player from going out side the screen
         if self.rect.left < 0:
-            self.rect.left = 0 
+            self.rect.left = 0
+        if self.hidden and pg.time.get_ticks() - self.hide_timer > 1000:
+            self.hidden = False
+            self.rect.centerx = WIDTH / 2
+            self.rect.bottom = HEIGHT - 10
     
-
+    def hide (self):
+        #hide the player temporarily
+        self.hidden = True
+        self.hide_timer = pg.time.get_ticks()
+        self.rect.center = (WIDTH/2, HEIGHT + 200) #moves the player off screen
+        
     def shoot(self):
         bullet = Bullet(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
@@ -234,10 +255,11 @@ while running:
     # Invaders shooting
     for row in invaders:
         for inv in row:
-            if random.random() < SHOOT_CHANCE:
-                bullet = InvaderBullet(inv.rect.centerx, inv.rect.bottom)
-                invader_bullets.add(bullet)
-                all_sprites.add(bullet)
+            if inv.alive():
+                if random.random() < SHOOT_CHANCE:
+                    bullet = InvaderBullet(inv.rect.centerx, inv.rect.bottom)
+                    invader_bullets.add(bullet)
+                    all_sprites.add(bullet)
 
     # Update bullets
     invader_bullets.update()
@@ -248,17 +270,20 @@ while running:
         remove_invader(invader)
 
 
-    # Defender gets = game over
+    # Defender gets hits and loses a life
     if pg.sprite.spritecollide(player, invader_bullets, True):
         player.hide()
         player.lives -= 1
-        running = False
+    # Check for game over
+    if player.lives == 0:
+        running = False 
         print("GAME OVER You have died.")
 
 
     # Creates frame
     screen.fill(BLACK)
     all_sprites.draw(screen)
+    draw_text(screen,"lives = " + str(player.lives), 22, WIDTH /10, 10)
     pg.display.flip()
     clock.tick(45) # game speed in fps
 
