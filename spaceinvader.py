@@ -262,6 +262,53 @@ while running:
     pg.display.flip()
     clock.tick(45) # game speed in fps
 
+class Barrier(pg.sprite):
+    def _init_(self, x,y):
+            super()._init_()
+            self.original_image = pg.image.load("barriers.png").convert_alpha()
+            self.image = self.original_image.copy()
+            self.rect = self.image.get_rect(center=(x, y))
+        
+            # HEALTH SYSTEM – barrier loses pieces as HP drops
+            self.health = 5  
+
+    def damage(self):
+        self.health -= 1
+        if self.health <= 0:
+            self.kill()
+        else:
+            # Fade barrier as it takes damage
+            alpha = int(255 * (self.health / 5))
+            self.image = self.original_image.copy()
+            self.image.set_alpha(alpha)
+
+
+barriers = pg.sprite.Group()
+
+barrier_positions = [
+    (WIDTH * 0.2, HEIGHT * 0.75),
+    (WIDTH * 0.4, HEIGHT * 0.75),
+    (WIDTH * 0.6, HEIGHT * 0.75),
+    (WIDTH * 0.8, HEIGHT * 0.75)
+]
+
+for x, y in barrier_positions:
+    b = Barrier(x, y)
+    barriers.add(b)
+    all_sprites.add(b)
+
+hits = pg.sprite.groupcollide(barriers, bullets, False, True)
+for barrier, bullet_list in hits.items():
+    barrier.damage()
+
+hits = pg.sprite.groupcollide(barriers, invader_bullets, False, True)
+for barrier, bullet_list in hits.items():
+    barrier.damage()
+
+# check defender bullet hitting invader
+hits = pg.sprite.groupcollide(invader_group, bullets, True, True)
+for invader, bullet_list in hits.items():
+    remove_invader(invader)
+
 pg.quit()
-
-
+ 
