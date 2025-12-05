@@ -9,7 +9,7 @@ screen = pg.display.set_mode([WIDTH, HEIGHT])
 pg.display.set_caption("Space Invaders")
 clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
 
-BLACK = (0, 0, 0)
+BLACK = (0, 0, 0)  
 WHITE = (255, 255, 255)
 
 font_name = pg.font.match_font("arial")
