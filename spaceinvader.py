@@ -336,4 +336,3 @@ for invader, bullet_list in hits.items():
     remove_invader(invader)
 
 pg.quit()
- 
