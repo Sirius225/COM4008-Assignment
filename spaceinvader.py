@@ -335,4 +335,14 @@ hits = pg.sprite.groupcollide(invader_group, bullets, True, True)
 for invader, bullet_list in hits.items():
     remove_invader(invader)
 
+# Barrier block class
+class Block(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pg.Surface((5, 5))
+        self.image.fill((255, 0, 0)) # green
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    
+
 pg.quit()
