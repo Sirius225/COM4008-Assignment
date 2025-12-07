@@ -196,7 +196,7 @@ for row in range(ROWS):
     invaders.append(row_list)
 
 #creates the player
-bullets = pg.sprite.Group()
+bullets =  pg.sprite.Group()
 player = Player()
 all_sprites.add(player)
 
@@ -287,9 +287,9 @@ while running:
     pg.display.flip()
     clock.tick(45) # game speed in fps
 
-class Barrier(pg.sprite):
+class Barrier ((pg.sprite).Sprite):
     def _init_(self, x,y):
-            super()._init_()
+            super()._init_() 
             self.original_image = pg.image.load("barriers.png").convert_alpha()
             self.image = self.original_image.copy()
             self.rect = self.image.get_rect(center=(x, y))
@@ -335,40 +335,5 @@ hits = pg.sprite.groupcollide(invader_group, bullets, True, True)
 for invader, bullet_list in hits.items():
     remove_invader(invader)
 
-# Barrier block class
-class Block(pg.sprite.Sprite):
-    def __init__(self,size,colour, x, y):
-        super().__init__()
-        self.image = pg.Surface((5, 5))
-        self.image.fill((255, 0, 0)) # green
-        self.rect = self.image.get_rect(topleft=(x, y))
-      
-shape = [
-
-"  xxxxxxx",
-" xxxxxxxxxx",
-"xxxxxxxxxxxxx",
-"xxxxxxxxxxxxx",
-"xxxxxxxxxxxxx",
-"xxx       xxx",
-"xx         xx"]   
-
-
-def make_barriers():
-    barriers = pg.sprite.Group()
-    barrier_x_positions = [30, 150, 270, 390, 510]
-    barrier_y = 450
-    
-    for bx in barrier_x_positions:
-        for row_index, row in enumerate(shape):
-            for col_index, char in enumerate(row):
-                if char == "x":
-                    x = bx + col_index * 5
-                    y = barrier_y + row_index * 5
-                    block = Block(x, y)
-                    barriers.add(block)
-
-
-    return barriers
-
 pg.quit()
+ 
