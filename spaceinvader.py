@@ -213,7 +213,23 @@ def get_edges(): # This gets the information of the leftmost and rightmost invad
     return left, right
 
 
-# The game Loop
+# ----------------------------------------
+# Game Loop
+# 1. Keyboard defender movement control
+# 2. Invader shift down logic
+# 3. Bullet updates
+# 4. Bullet / Sprite Collision / Distance Hit Control (Speed)
+# 5. Frame refresh
+# 6. Sprite rendering
+# 7. Set const frame tick
+#
+# Improvements
+# Further modulariation of the game loop will make it
+# easier to read.
+# 
+# Notes:
+# Sprites use kill() & alive() to check their existence
+# ----------------------------------------
 
 running = True
 clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
