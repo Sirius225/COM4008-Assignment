@@ -206,7 +206,7 @@ speed_x = 1
 move_down_amount = 20
 
 SHOOT_CHANCE = 0.001
-
+#gets the leftmost and rightmost invader.
 def get_edges(): # This gets the information of the leftmost and rightmost invaders to allow the group to shift down when they touch the edge of the screen
     left = min(inv.rect.left for row in invaders for inv in row)
     right = max(inv.rect.right for row in invaders for inv in row)
