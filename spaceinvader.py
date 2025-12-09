@@ -237,7 +237,7 @@ barrier_positions = [
 ]
 
 for x, y in barrier_positions:
-    b = barriers(x, y)
+    b =Barrier(x, y)
     barriers.add(b)
     all_sprites.add(b)
 
