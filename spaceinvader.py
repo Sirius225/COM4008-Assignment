@@ -200,6 +200,20 @@ bullets =  pg.sprite.Group()
 player = Player()
 all_sprites.add(player)
 
+# Create barriers BEFORE the game loop
+barriers = pg.sprite.Group()
+
+barrier_positions = [
+    (WIDTH * 0.2, HEIGHT * 0.75),
+    (WIDTH * 0.4, HEIGHT * 0.75),
+    (WIDTH * 0.6, HEIGHT * 0.75),
+    (WIDTH * 0.8, HEIGHT * 0.75)
+]
+
+for x, y in barrier_positions:
+    b = Barrier(x, y)
+    barriers.add(b)
+    all_sprites.add(b)
 
 # Movement
 speed_x = 1
@@ -208,8 +222,8 @@ move_down_amount = 20
 SHOOT_CHANCE = 0.001
 
 def get_edges(): # This gets the information of the leftmost and rightmost invaders to allow the group to shift down when they touch the edge of the screen
-    left = min(inv.rect.left for row in invaders for inv in row)
-    right = max(inv.rect.right for row in invaders for inv in row)
+    left = min(inv.rect.left for row in invaders for inv in row if inv.alive())
+    right = max(inv.rect.right for row in invaders for inv in row if inv.alive())
     return left, right
 
 
@@ -225,11 +239,24 @@ while running:
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
                 player.shoot()
-    #player movement
+
+    #player movement & sprite update
     all_sprites.update()
+
     
-    left_edge, right_edge = get_edges() #Finds the leftmost and rightmost invaders in the array
-    shift_down = False
+    # Some invaders might be dead; if none are alive, get_edges would fail - protect against that
+    alive_invaders = [inv for row in invaders for inv in row if inv.alive()]
+    if alive_invaders:
+        left_edge = min(inv.rect.left for inv in alive_invaders)
+        right_edge = max(inv.rect.right for inv in alive_invaders)
+    else:
+        # Player wins - end the game loop (or you can add a win screen)
+        print("YOU WIN!")
+        running = False
+        left_edge, right_edge = 0, 0
+
+    shift_down = False 
+
 
     # When any invader hits the wall it reverses the direction and moves down the sprites
     if right_edge >= WIDTH - 10: #invader hits right side shifts down and starts to move left. -10 allows for them to not visually stick to the wall
@@ -242,15 +269,17 @@ while running:
     # If the invaders hit a wall they will shift down.
     for row in invaders:
         for inv in row:
-            if shift_down:
-                inv.move(0, move_down_amount) #shifts down the invaders
-            inv.move(speed_x, 0) #This will then make them move either left or right
+            if inv.alive():
+                if shift_down:
+                    inv.move(0, move_down_amount) #shifts down the invaders
+                inv.move(speed_x, 0) #This will then make them move either left or right
 
     for row in invaders:
         for inv in row:
-            if inv.rect.bottom >= player.rect.top: #checks when the invaders touch the bottom of the screen
+            if inv.alive() and inv.rect.bottom >= player.rect.top: #checks when the invaders touch the bottom of the screen
                 running = False #end the game
                 print("GAME OVER")
+
 
     # Invaders shooting
     for row in invaders:
@@ -264,76 +293,37 @@ while running:
     # Update bullets
     invader_bullets.update()
 
-  # check to see if bullet hit an invader
-    hits = pg.sprite.groupcollide(invader_group, bullets, True, True)
-    for invader, bullet_list in hits.items():
-        remove_invader(invader)
+# check to see if defender bullet hit an invader
+hits_inv = pg.sprite.groupcollide(invader_group, bullets, True, True)
+for invader, bullet_list in hits_inv.items():
+     remove_invader(invader)
+
+# check defender bullets hitting barriers (barrier damaged, bullets removed)
+hits_barrier_def = pg.sprite.groupcollide(barriers, bullets, False, True)
+for barrier, bullet_list in hits_barrier_def.items():
+        barrier.damage()
+
+# check invader bullets hitting barriers (barrier damaged, invader bullets removed)
+hits_barrier_inv = pg.sprite.groupcollide(barriers, invader_bullets, False, True)
+for barrier, bullet_list in hits_barrier_inv.items():
+    barrier.damage()
 
 
-    # Defender gets hits and loses a life
-    if pg.sprite.spritecollide(player, invader_bullets, True):
-        player.hide()
-        player.lives -= 1
+# Defender gets hits and loses a life
+if pg.sprite.spritecollide(player, invader_bullets, True):
+    player.hide()
+    player.lives -= 1
     # Check for game over
-    if player.lives == 0:
-        running = False 
-        print("GAME OVER You have died.")
+if player.lives == 0:
+    running = False
+    print("GAME OVER You have died.")
 
-
-    # Creates frame
-    screen.fill(BLACK)
-    all_sprites.draw(screen)
-    draw_text(screen,"lives = " + str(player.lives), 22, WIDTH /10, 10)
-    pg.display.flip()
-    clock.tick(45) # game speed in fps
-
-class Barrier ((pg.sprite).Sprite):
-    def _init_(self, x,y):
-            super()._init_() 
-            self.original_image = pg.image.load("barriers.png").convert_alpha()
-            self.image = self.original_image.copy()
-            self.rect = self.image.get_rect(center=(x, y))
-        
-            # HEALTH SYSTEM – barrier loses pieces as HP drops
-            self.health = 5  
-
-    def damage(self):
-        self.health -= 1
-        if self.health <= 0:
-            self.kill()
-        else:
-            # Fade barrier as it takes damage
-            alpha = int(255 * (self.health / 5))
-            self.image = self.original_image.copy()
-            self.image.set_alpha(alpha)
-
-
-barriers = pg.sprite.Group()
-
-barrier_positions = [
-    (WIDTH * 0.2, HEIGHT * 0.75),
-    (WIDTH * 0.4, HEIGHT * 0.75),
-    (WIDTH * 0.6, HEIGHT * 0.75),
-    (WIDTH * 0.8, HEIGHT * 0.75)
-]
-
-for x, y in barrier_positions:
-    b = Barrier(x, y)
-    barriers.add(b)
-    all_sprites.add(b)
-
-hits = pg.sprite.groupcollide(barriers, bullets, False, True)
-for barrier, bullet_list in hits.items():
-    barrier.damage()
-
-hits = pg.sprite.groupcollide(barriers, invader_bullets, False, True)
-for barrier, bullet_list in hits.items():
-    barrier.damage()
-
-# check defender bullet hitting invader
-hits = pg.sprite.groupcollide(invader_group, bullets, True, True)
-for invader, bullet_list in hits.items():
-    remove_invader(invader)
+# Creates frame
+screen.fill(BLACK)
+all_sprites.draw(screen)
+draw_text(screen, "lives = " + str(player.lives), 22, WIDTH / 10, 10)
+pg.display.flip()
+clock.tick(45) # game speed in fps
 
 pg.quit()
  
