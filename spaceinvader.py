@@ -220,14 +220,30 @@ speed_x = 1
 move_down_amount = 20
 
 SHOOT_CHANCE = 0.001
-
+#gets the leftmost and rightmost invader.
 def get_edges(): # This gets the information of the leftmost and rightmost invaders to allow the group to shift down when they touch the edge of the screen
     left = min(inv.rect.left for row in invaders for inv in row if inv.alive())
     right = max(inv.rect.right for row in invaders for inv in row if inv.alive())
     return left, right
 
 
-# The game Loop
+# ----------------------------------------
+# Game Loop
+# 1. Keyboard defender movement control
+# 2. Invader shift down logic
+# 3. Bullet updates
+# 4. Bullet / Sprite Collision / Distance Hit Control (Speed)
+# 5. Frame refresh
+# 6. Sprite rendering
+# 7. Set const frame tick
+#
+# Improvements
+# Further modulariation of the game loop will make it
+# easier to read.
+# 
+# Notes:
+# Sprites use kill() & alive() to check their existence
+# ----------------------------------------
 
 running = True
 clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
