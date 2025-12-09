@@ -153,6 +153,32 @@ class InvaderBullet(pg.sprite.Sprite):
         if self.rect.y > HEIGHT:
             self.kill()
 
+# Barrier class (fixed)
+class Barrier(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        # load image - user confirmed filename is barrier.png
+        self.original_image = pg.image.load("barrier.png").convert_alpha()
+        # scale barrier if it is too big (optional): comment out if not needed
+        self.original_image = pg.transform.scale(self.original_image, (80, 40))
+        self.image = self.original_image.copy()
+        self.rect = self.image.get_rect(center=(x, y))
+
+        # HEALTH SYSTEM – barrier loses pieces as HP drops
+        self.health = 5
+
+    def damage(self):
+        self.health -= 1
+        if self.health <= 0:
+            self.kill()
+        else:
+            # Fade barrier as it takes damage
+            alpha = int(255 * (self.health / 5))
+            self.image = self.original_image.copy()
+            # apply alpha to whole surface
+            self.image.set_alpha(alpha)
+
+
 #Invaders speed up when destroyed
 INVADER_SPEED_MULTIPLIER = 1.05
 
@@ -211,7 +237,7 @@ barrier_positions = [
 ]
 
 for x, y in barrier_positions:
-    b = Barrier(x, y)
+    b = barriers(x, y)
     barriers.add(b)
     all_sprites.add(b)
 
@@ -220,30 +246,14 @@ speed_x = 1
 move_down_amount = 20
 
 SHOOT_CHANCE = 0.001
-#gets the leftmost and rightmost invader.
+
 def get_edges(): # This gets the information of the leftmost and rightmost invaders to allow the group to shift down when they touch the edge of the screen
     left = min(inv.rect.left for row in invaders for inv in row if inv.alive())
     right = max(inv.rect.right for row in invaders for inv in row if inv.alive())
     return left, right
 
 
-# ----------------------------------------
-# Game Loop
-# 1. Keyboard defender movement control
-# 2. Invader shift down logic
-# 3. Bullet updates
-# 4. Bullet / Sprite Collision / Distance Hit Control (Speed)
-# 5. Frame refresh
-# 6. Sprite rendering
-# 7. Set const frame tick
-#
-# Improvements
-# Further modulariation of the game loop will make it
-# easier to read.
-# 
-# Notes:
-# Sprites use kill() & alive() to check their existence
-# ----------------------------------------
+# The game Loop
 
 running = True
 clock = pg.time.Clock() # adds clock object to allow for the controlling of game speed
@@ -255,24 +265,11 @@ while running:
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
                 player.shoot()
-
-    #player movement & sprite update
+    #player movement
     all_sprites.update()
-
     
-    # Some invaders might be dead; if none are alive, get_edges would fail - protect against that
-    alive_invaders = [inv for row in invaders for inv in row if inv.alive()]
-    if alive_invaders:
-        left_edge = min(inv.rect.left for inv in alive_invaders)
-        right_edge = max(inv.rect.right for inv in alive_invaders)
-    else:
-        # Player wins - end the game loop (or you can add a win screen)
-        print("YOU WIN!")
-        running = False
-        left_edge, right_edge = 0, 0
-
-    shift_down = False 
-
+    left_edge, right_edge = get_edges() #Finds the leftmost and rightmost invaders in the array
+    shift_down = False
 
     # When any invader hits the wall it reverses the direction and moves down the sprites
     if right_edge >= WIDTH - 10: #invader hits right side shifts down and starts to move left. -10 allows for them to not visually stick to the wall
@@ -285,20 +282,23 @@ while running:
     # If the invaders hit a wall they will shift down.
     for row in invaders:
         for inv in row:
-            if inv.alive():
-                if shift_down:
-                    inv.move(0, move_down_amount) #shifts down the invaders
-                inv.move(speed_x, 0) #This will then make them move either left or right
+            if shift_down:
+                inv.move(0, move_down_amount) #shifts down the invaders
+            inv.move(speed_x, 0) #This will then make them move either left or right
 
     for row in invaders:
         for inv in row:
-            if inv.alive() and inv.rect.bottom >= player.rect.top: #checks when the invaders touch the bottom of the screen
+            if inv.rect.bottom >= player.rect.top: #checks when the invaders touch the bottom of the screen
                 running = False #end the game
                 print("GAME OVER")
 
 
-    # Invaders shooting
-    for row in invaders:
+
+# Update bullets 
+invader_bullets.update()
+
+# Invaders shooting
+for row in invaders:
         for inv in row:
             if inv.alive():
                 if random.random() < SHOOT_CHANCE:
@@ -306,8 +306,8 @@ while running:
                     invader_bullets.add(bullet)
                     all_sprites.add(bullet)
 
-    # Update bullets
-    invader_bullets.update()
+# Update bullets
+invader_bullets.update()
 
 # check to see if defender bullet hit an invader
 hits_inv = pg.sprite.groupcollide(invader_group, bullets, True, True)
@@ -329,7 +329,7 @@ for barrier, bullet_list in hits_barrier_inv.items():
 if pg.sprite.spritecollide(player, invader_bullets, True):
     player.hide()
     player.lives -= 1
-    # Check for game over
+# Check for game over
 if player.lives == 0:
     running = False
     print("GAME OVER You have died.")
@@ -340,6 +340,5 @@ all_sprites.draw(screen)
 draw_text(screen, "lives = " + str(player.lives), 22, WIDTH / 10, 10)
 pg.display.flip()
 clock.tick(45) # game speed in fps
-
 pg.quit()
  
